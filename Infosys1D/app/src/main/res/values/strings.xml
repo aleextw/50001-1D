@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">Infosys 1D</string>
+
+    <string name="no_username">Please enter a username.</string>
+    <string name="no_password">Please enter a password.</string>
+    <string name="successful_login">Succesfully logged in.</string>
+    <string name="successful_password_reset">A reset link has been sent to your email.</string>
+    <string name="unsuccessful_login">Invalid credentials. Please try again.</string>
+    <string name="empty_field">Please fill up all fields.</string>
+    <string name="unmatched_passwords">Passwords do not match.</string>
+    <string name="user_already_exists">This user already exists.</string>
+
+    <string name="successful_logout">Successfully logged out.</string>
+    <string name="unsuccessful_logout">Failed to log out.</string>
+
+    <string name="database_error">Error retrieving data, please try again.</string>
+
+    <string name="successful_module_add">Module added successfully!</string>
+    <string name="unsuccessful_module_add">Failed to add module.</string>
+
+    <string name="successful_module_delete">Module deleted successfully!</string>
+    <string name="unsuccessful_module_delete">Failed to delete module.</string>
+
+    <string name="successful_schedule_add">Deadline added successfully!</string>
+    <string name="unsuccessful_schedule_add">Failed to add deadline.</string>
+
+    <string name="successful_schedule_delete">Deadline deleted successfully!</string>
+    <string name="unsuccessful_schedule_delete">Failed to delete deadline.</string>
+
+
+    <string name="module_name_error">Module name can\'t be empty!</string>
+    <string name="module_id_error">Module ID can\'t be empty!</string>
+
+    <string name="new_schedule_item_empty_field">All fields have to be entered.</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="API_AUTHORITY">http://10.0.2.2:8000/</string>
+    <string name="LOGIN_PATH">login/</string>
+    <string name="LOGOUT_PATH">logout/</string>
+    <string name="SIGNUP_PATH">signup/</string>
+    <string name="SCHEDULE_PATH">schedule/</string>
+    <string name="STUDENT_PATH">student/</string>
+    <string name="FACULTY_PATH">faculty/</string>
+    <string name="MODULE_PATH">modules/</string>
+    <string name="ADD_PATH">add/</string>
+    <string name="DELETE_PATH">delete/</string>
+    <string name="TOGGLE_PATH">toggle/</string>
+</resources>
