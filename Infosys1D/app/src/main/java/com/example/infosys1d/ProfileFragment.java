@@ -45,7 +45,7 @@ public class ProfileFragment extends Fragment {
                 SharedPreferences mPreferences = view.getContext().getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
                 String auth_string = mPreferences.getString("auth_string", "");
                 if (auth_string.equals("")) {
-                    Toast.makeText(view.getContext(), "Invalid auth string.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(view.getContext(), "Invalid auth string.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -77,13 +77,13 @@ public class ProfileFragment extends Fragment {
                             @Override
                             public void run() {
                                 if (response[0] == null) {
-                                    Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_SHORT).show();
                                 } else if (response[0].code() == 200) {
-                                    Toast.makeText(view.getContext(), R.string.successful_logout, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(view.getContext(), R.string.successful_logout, Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(view.getContext(), LoginActivity.class);
                                     startActivity(intent);
                                 } else {
-                                    Toast.makeText(view.getContext(), R.string.unsuccessful_logout, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(view.getContext(), R.string.unsuccessful_logout, Toast.LENGTH_SHORT).show();
                                     Log.i("LOGOUT", String.valueOf(response[0].code()));
                                 }
                             }

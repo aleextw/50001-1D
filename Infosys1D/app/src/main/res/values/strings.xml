@@ -24,6 +24,9 @@
     <string name="successful_schedule_add">Deadline added successfully!</string>
     <string name="unsuccessful_schedule_add">Failed to add deadline.</string>
 
+    <string name="successful_schedule_toggle">Deadline toggled.</string>
+    <string name="unsuccessful_schedule_toggle">Failed to toggle deadline.</string>
+
     <string name="successful_schedule_delete">Deadline deleted successfully!</string>
     <string name="unsuccessful_schedule_delete">Failed to delete deadline.</string>
 

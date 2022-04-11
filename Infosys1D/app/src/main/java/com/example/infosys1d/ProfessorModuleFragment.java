@@ -206,15 +206,15 @@ public class ProfessorModuleFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (addModuleID.getText().toString().equals("")) {
-                    Toast.makeText(view.getContext(), R.string.module_id_error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(view.getContext(), R.string.module_id_error, Toast.LENGTH_SHORT).show();
                 } else if (addModuleName.getText().toString().equals("")) {
-                    Toast.makeText(view.getContext(), R.string.module_name_error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(view.getContext(), R.string.module_name_error, Toast.LENGTH_SHORT).show();
                 } else {
                     final String PREF_FILE = "main_shared_preferences";
                     SharedPreferences mPreferences = view.getContext().getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
                     String auth_string = mPreferences.getString("auth_string", "");
                     if (auth_string.equals("")) {
-                        Toast.makeText(view.getContext(), "Invalid auth string.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(view.getContext(), "Invalid auth string.", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -250,12 +250,12 @@ public class ProfessorModuleFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     if (response[0] == null) {
-                                        Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_SHORT).show();
                                     } else if (response[0].code() == 200) {
                                         reloadData(getView());
-                                        Toast.makeText(view.getContext(), R.string.successful_module_add, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(view.getContext(), R.string.successful_module_add, Toast.LENGTH_SHORT).show();
                                     } else {
-                                        Toast.makeText(view.getContext(), R.string.unsuccessful_module_add, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(view.getContext(), R.string.unsuccessful_module_add, Toast.LENGTH_SHORT).show();
                                         Log.i("PROFESSOR ADD MODULE", String.valueOf(response[0].code()));
                                     }
                                 }

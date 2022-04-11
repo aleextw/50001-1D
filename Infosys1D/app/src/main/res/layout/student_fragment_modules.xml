@@ -56,7 +56,7 @@
         tools:context=".MainActivity">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/module_fragment_recycler_view"
+            android:id="@+id/student_module_fragment_recycler_view"
             android:layout_width="409dp"
             android:layout_height="609dp"
             app:layout_constraintBottom_toBottomOf="parent"

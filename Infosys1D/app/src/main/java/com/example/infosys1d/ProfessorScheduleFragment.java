@@ -150,11 +150,11 @@ public class ProfessorScheduleFragment extends Fragment {
                                                                             @Override
                                                                             public void run() {
                                                                                 if (response[0] == null) {
-                                                                                    Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_LONG).show();
+                                                                                    Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_SHORT).show();
                                                                                 } else if (response[0].code() == 200) {
-                                                                                    Toast.makeText(view.getContext(), R.string.successful_schedule_delete, Toast.LENGTH_LONG).show();
+                                                                                    Toast.makeText(view.getContext(), R.string.successful_schedule_delete, Toast.LENGTH_SHORT).show();
                                                                                 } else {
-                                                                                    Toast.makeText(view.getContext(), R.string.unsuccessful_schedule_delete, Toast.LENGTH_LONG).show();
+                                                                                    Toast.makeText(view.getContext(), R.string.unsuccessful_schedule_delete, Toast.LENGTH_SHORT).show();
                                                                                     Log.i("PROFESSOR DEL SCHEDULE", String.valueOf(response[0].code()));
                                                                                 }
                                                                             }

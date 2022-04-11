@@ -82,9 +82,9 @@ public class SignupActivity extends AppCompatActivity {
                 // TODO: Shift POST request to secondary method and keep checks in primary method
                 if (username.isEmpty() || firstName.isEmpty() || lastName.isEmpty() ||
                         password.isEmpty() || confirmPassword.isEmpty()) {
-                    Toast.makeText(SignupActivity.this, R.string.empty_field, Toast.LENGTH_LONG).show();
+                    Toast.makeText(SignupActivity.this, R.string.empty_field, Toast.LENGTH_SHORT).show();
                 } else if (!password.equals(confirmPassword)) {
-                    Toast.makeText(SignupActivity.this, R.string.unmatched_passwords, Toast.LENGTH_LONG).show();
+                    Toast.makeText(SignupActivity.this, R.string.unmatched_passwords, Toast.LENGTH_SHORT).show();
                 } else {
                     JSONObject params = new JSONObject();
                     try {
@@ -120,19 +120,19 @@ public class SignupActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     if (response[0] == null) {
-                                        Toast.makeText(SignupActivity.this, R.string.database_error, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(SignupActivity.this, R.string.database_error, Toast.LENGTH_SHORT).show();
                                     } else if (response[0].code() == 200) {
                                         String result = null;
                                         try {
                                             result = response[0].body().string();
                                             JSONObject data = new JSONObject(result);
-                                            Toast.makeText(SignupActivity.this, R.string.successful_login, Toast.LENGTH_LONG).show();
+                                            Toast.makeText(SignupActivity.this, R.string.successful_login, Toast.LENGTH_SHORT).show();
 
                                             mPreferences = SignupActivity.this.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
                                             SharedPreferences.Editor editor = mPreferences.edit();
                                             editor.putString("auth_string", data.getString("auth_string"));
                                             editor.apply();
-                                            Toast.makeText(SignupActivity.this, R.string.successful_login, Toast.LENGTH_LONG).show();
+                                            Toast.makeText(SignupActivity.this, R.string.successful_login, Toast.LENGTH_SHORT).show();
 
                                             Log.i("SIGNUP", data.toString());
                                             if (data.getInt("state") == 1) {

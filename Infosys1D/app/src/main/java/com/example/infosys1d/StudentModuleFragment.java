@@ -51,7 +51,7 @@ public class StudentModuleFragment extends Fragment {
 
         String authority = getResources().getString(R.string.API_AUTHORITY);
         String studentPath = getResources().getString(R.string.STUDENT_PATH);
-        String schedulePath = getResources().getString(R.string.SCHEDULE_PATH);
+        String modulePath = getResources().getString(R.string.MODULE_PATH);
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Looper uiLooper = Looper.getMainLooper();
@@ -62,7 +62,7 @@ public class StudentModuleFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    response[0] = UserUtils.queryAPI(authority + studentPath + schedulePath, params);
+                    response[0] = UserUtils.queryAPI(authority + studentPath + modulePath, params);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -78,12 +78,12 @@ public class StudentModuleFragment extends Fragment {
                                 result = response[0].body().string();
                                 JSONArray data = new JSONArray(result);
 
-                                Log.i("STUDENT SCHEDULE", data.toString());
+                                Log.i("STUDENT MODULE", data.toString());
 
-                                RecyclerView recyclerView = view.findViewById(R.id.student_schedule_fragment_recycler_view);
-                                StudentScheduleAdapter studentScheduleAdapter = new StudentScheduleAdapter(view.getContext(), data);
+                                RecyclerView recyclerView = view.findViewById(R.id.student_module_fragment_recycler_view);
+                                ModuleAdapter moduleAdapter = new ModuleAdapter(view.getContext(), data);
 
-                                recyclerView.setAdapter(studentScheduleAdapter);
+                                recyclerView.setAdapter(moduleAdapter);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
                                 ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -94,29 +94,29 @@ public class StudentModuleFragment extends Fragment {
 
                                     @Override
                                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                                        StudentScheduleAdapter.ArrayViewHolder arrayViewHolder = (StudentScheduleAdapter.ArrayViewHolder) viewHolder;
+                                        ModuleAdapter.ArrayViewHolder arrayViewHolder = (ModuleAdapter.ArrayViewHolder) viewHolder;
                                         int position = arrayViewHolder.getAdapterPosition();
 
                                         final String PREF_FILE = "main_shared_preferences";
                                         SharedPreferences mPreferences = view.getContext().getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
                                         String auth_string = mPreferences.getString("auth_string", "");
                                         if (auth_string.equals("")) {
-                                            Toast.makeText(view.getContext(), "Invalid auth string.", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(view.getContext(), "Invalid auth string.", Toast.LENGTH_SHORT).show();
                                             return;
                                         }
 
                                         JSONObject params = new JSONObject();
                                         try {
                                             params.put("auth_string", auth_string);
-                                            params.put("module_id", studentScheduleAdapter.dataSource.getJSONObject(position).get("module_id"));
+                                            params.put("module_id", moduleAdapter.dataSource.getJSONObject(position).get("module_id"));
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
                                         Log.i("STUDENT TOGGLE SCHEDULE", params.toString());
                                         String authority = getResources().getString(R.string.API_AUTHORITY);
                                         String studentPath = getResources().getString(R.string.STUDENT_PATH);
-                                        String schedulePath = getResources().getString(R.string.SCHEDULE_PATH);
-                                        String togglePath = getResources().getString(R.string.TOGGLE_PATH);
+                                        String modulePath = getResources().getString(R.string.MODULE_PATH);
+                                        String deletePath = getResources().getString(R.string.DELETE_PATH);
 
                                         ExecutorService executor = Executors.newSingleThreadExecutor();
                                         Looper uiLooper = Looper.getMainLooper();
@@ -127,7 +127,7 @@ public class StudentModuleFragment extends Fragment {
                                             @Override
                                             public void run() {
                                                 try {
-                                                    response[0] = UserUtils.queryAPI(authority + studentPath + schedulePath + togglePath, params);
+                                                    response[0] = UserUtils.queryAPI(authority + studentPath + modulePath + deletePath, params);
                                                 } catch (IOException e) {
                                                     e.printStackTrace();
                                                 }
@@ -136,18 +136,18 @@ public class StudentModuleFragment extends Fragment {
                                                     @Override
                                                     public void run() {
                                                         if (response[0] == null) {
-                                                            Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_LONG).show();
+                                                            Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_SHORT).show();
                                                         } else if (response[0].code() == 200) {
                                                         } else {
-                                                            Log.i("STUDENT TOGGLE SCHEDULE", String.valueOf(response[0].code()));
+                                                            Log.i("STUDENT DELETE MODULE", String.valueOf(response[0].code()));
                                                         }
                                                     }
                                                 });
                                             }
                                         });
 
-                                        studentScheduleAdapter.dataSource.remove(position);
-                                        studentScheduleAdapter.notifyDataSetChanged();
+                                        moduleAdapter.dataSource.remove(position);
+                                        reloadData(view);
                                     }
                                 };
 
@@ -159,7 +159,7 @@ public class StudentModuleFragment extends Fragment {
                             }
 
                         } else {
-                            Log.i("STUDENT SCHEDULE", String.valueOf(response[0].code()));
+                            Log.i("STUDENT MODULE", String.valueOf(response[0].code()));
                         }
                     }
                 });

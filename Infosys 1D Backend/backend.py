@@ -198,10 +198,10 @@ async def student_schedule(auth_string: AuthString):
                 completed = session.execute(
                     select(Todo)
                     .where(Todo.schedule_id == s.id)
-                    .where(Todo.student == user.username)
+                    .where(Todo.student == user[0].username)
                 ).scalars().all()
-
-                if completed is None:
+                
+                if len(completed) == 0:
                     completed = "Not Done"
                 else:
                     completed = ("Not Done", "Done")[completed[0].status]
@@ -215,13 +215,13 @@ async def student_schedule(auth_string: AuthString):
                         "done" : completed
                     }
                 )
-
-            return ret_val
+            return sorted(ret_val, key=lambda x:x["date"])
         raise HTTPException(status_code=418, detail="Invalid user status.")
     raise HTTPException(status_code=418, detail="Invalid auth string.")
 
-@app.post('/student/schedule/toggle')
+@app.post('/student/schedule/toggle/')
 async def student_schedule_toggle(schedule_data: ScheduleData):
+    print(schedule_data)
     user = session.execute(select(User)
         .join(Auth, User.username == Auth.user)
         .where(Auth.auth_string == schedule_data.auth_string)
@@ -236,8 +236,8 @@ async def student_schedule_toggle(schedule_data: ScheduleData):
             ).first()
 
             if todo is None:
-                todo = [Todo(id=schedule_data.id, student=user[0].username, status=0)]
-                session.add(todo)
+                todo = [Todo(schedule_id=schedule_data.id, student=user[0].username, status=0)]
+                session.add(todo[0])
             
             todo[0].status = not todo[0].status
 
@@ -295,7 +295,7 @@ async def faculty_schedule(auth_string: AuthString):
                     }
                 )
 
-            return ret_val
+            return sorted(ret_val, key=lambda x:x["date"])
         raise HTTPException(status_code=418, detail="Invalid user status.")
     raise HTTPException(status_code=418, detail="Invalid auth string.")
 

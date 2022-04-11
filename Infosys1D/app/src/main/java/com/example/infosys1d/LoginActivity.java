@@ -65,9 +65,9 @@ public class LoginActivity extends AppCompatActivity {
                 String password = passwordTextView.getText().toString();
 
                 if (username.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, R.string.no_username, Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, R.string.no_username, Toast.LENGTH_SHORT).show();
                 } else if (password.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, R.string.no_password, Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, R.string.no_password, Toast.LENGTH_SHORT).show();
                 } else {
                     JSONObject params = new JSONObject();
                     try {
@@ -99,19 +99,19 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     if (response[0] == null) {
-                                        Toast.makeText(LoginActivity.this, R.string.database_error, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(LoginActivity.this, R.string.database_error, Toast.LENGTH_SHORT).show();
                                     } else if (response[0].code() == 200) {
                                         String result = null;
                                         try {
                                             result = response[0].body().string();
                                             JSONObject data = new JSONObject(result);
-                                            Toast.makeText(LoginActivity.this, R.string.successful_login, Toast.LENGTH_LONG).show();
+                                            Toast.makeText(LoginActivity.this, R.string.successful_login, Toast.LENGTH_SHORT).show();
 
                                             mPreferences = LoginActivity.this.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
                                             SharedPreferences.Editor editor = mPreferences.edit();
                                             editor.putString("auth_string", data.getString("auth_string"));
                                             editor.apply();
-                                            Toast.makeText(LoginActivity.this, R.string.successful_login, Toast.LENGTH_LONG).show();
+                                            Toast.makeText(LoginActivity.this, R.string.successful_login, Toast.LENGTH_SHORT).show();
 
                                             Log.i("LOGIN", data.toString());
                                             if (data.getInt("state") == 1) {
