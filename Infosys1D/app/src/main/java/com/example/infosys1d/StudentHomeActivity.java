@@ -10,7 +10,6 @@ import android.os.StrictMode;
 import android.view.MenuItem;
 
 public class StudentHomeActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
-
     BottomNavigationView bottomNavigationView;
 
     @Override

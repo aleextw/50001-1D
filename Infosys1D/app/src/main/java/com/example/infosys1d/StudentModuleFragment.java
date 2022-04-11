@@ -182,6 +182,70 @@ public class StudentModuleFragment extends Fragment {
             }
         });
 
+        Button addButton = view.findViewById(R.id.student_module_fragment_add_button);
+        EditText addModuleID = view.findViewById(R.id.student_module_fragment_add_module);
+
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (addModuleID.getText().toString().equals("")) {
+                    Toast.makeText(view.getContext(), R.string.module_id_error, Toast.LENGTH_SHORT).show();
+                } else {
+                    final String PREF_FILE = "main_shared_preferences";
+                    SharedPreferences mPreferences = view.getContext().getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+                    String auth_string = mPreferences.getString("auth_string", "");
+                    if (auth_string.equals("")) {
+                        Toast.makeText(view.getContext(), "Invalid auth string.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    JSONObject params = new JSONObject();
+                    try {
+                        params.put("auth_string", auth_string);
+                        params.put("module_id", addModuleID.getText().toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    String authority = getResources().getString(R.string.API_AUTHORITY);
+                    String studentPath = getResources().getString(R.string.STUDENT_PATH);
+                    String modulePath = getResources().getString(R.string.MODULE_PATH);
+                    String addPath = getResources().getString(R.string.ADD_PATH);
+
+                    ExecutorService executor = Executors.newSingleThreadExecutor();
+                    Looper uiLooper = Looper.getMainLooper();
+                    Handler handler = new Handler(uiLooper);
+                    final Response[] response = new Response[1];
+
+                    executor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                response[0] = UserUtils.queryAPI(authority + studentPath + modulePath + addPath, params);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (response[0] == null) {
+                                        Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_SHORT).show();
+                                    } else if (response[0].code() == 200) {
+                                        reloadData(getView());
+                                        Toast.makeText(view.getContext(), R.string.successful_module_add, Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(view.getContext(), R.string.unsuccessful_module_add, Toast.LENGTH_SHORT).show();
+                                        Log.i("STUDENT ADD MODULE", String.valueOf(response[0].code()));
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
+
         // Inflate the layout for this fragment
         return view;
     }
