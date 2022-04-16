@@ -381,6 +381,7 @@ async def student_modules(auth_string: AuthString):
         raise HTTPException(status_code=418, detail="Invalid user status.")
     raise HTTPException(status_code=418, detail="Invalid auth string.")
 
+
 @app.post('/student/modules/add/')
 async def student_add_module(module_data: ModuleData):
     user = session.execute(
@@ -496,5 +497,24 @@ async def faculty_delete_module(module_data: ModuleData):
             session.delete(module)
             session.commit()
             return
+        raise HTTPException(status_code=418, detail="Invalid user status.")
+    raise HTTPException(status_code=418, detail="Invalid auth string.")
+
+
+@app.post('/student/users/')
+async def student_modules(auth_string: AuthString):
+    user = session.execute(
+        select(User)
+            .join(Auth, User.username == Auth.user)
+            .where(Auth.auth_string == auth_string.auth_string)).first()
+    if user is not None:
+        if user[0].status == 0:
+            this_user = session.execute(
+                select(User)
+                    .where(User.username == user[0].username)
+                    # .where(Class.student == user[0].username)
+            ).scalars().all()
+
+            return this_user
         raise HTTPException(status_code=418, detail="Invalid user status.")
     raise HTTPException(status_code=418, detail="Invalid auth string.")
