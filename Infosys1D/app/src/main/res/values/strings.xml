@@ -47,6 +47,7 @@
     <string name="STUDENT_PATH">student/</string>
     <string name="FACULTY_PATH">faculty/</string>
     <string name="MODULE_PATH">modules/</string>
+    <string name="USERS_PATH">users/</string>
     <string name="ADD_PATH">add/</string>
     <string name="DELETE_PATH">delete/</string>
     <string name="TOGGLE_PATH">toggle/</string>
