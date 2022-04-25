@@ -32,10 +32,11 @@ import org.json.JSONObject;
 
 public class ProfileFragment extends Fragment {
 
-    public ProfileFragment(){
-        // require a empty public constructor
-    }
+    public ProfileFragment(){}
+
     void reloadData(View view) {
+        // reloadData() used to refresh fragment outside of onCreate()
+        // Get auth_string from Shared Preferences
         final String PREF_FILE = "main_shared_preferences";
         SharedPreferences mPreferences = view.getContext().getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
         String auth_string = mPreferences.getString("auth_string", "");
@@ -44,6 +45,7 @@ public class ProfileFragment extends Fragment {
             return;
         }
 
+        // Create new JSON object with auth_string
         JSONObject params = new JSONObject();
         try {
             params.put("auth_string", auth_string);
@@ -51,10 +53,12 @@ public class ProfileFragment extends Fragment {
             e.printStackTrace();
         }
 
+        // Setup variables for API endpoint
         String authority = getResources().getString(R.string.API_AUTHORITY);
         String studentPath = getResources().getString(R.string.STUDENT_PATH);
         String usersPath = getResources().getString(R.string.USERS_PATH);
 
+        // Query API in background thread
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Looper uiLooper = Looper.getMainLooper();
         Handler handler = new Handler(uiLooper);
@@ -73,8 +77,10 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void run() {
                         if (response[0] == null) {
+                            // If no response, API might be down; show generic error Toast to user
                             Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_LONG).show();
                         } else if (response[0].code() == 200) {
+                            // Success; get data from response as JSON array
                             String result = null;
                             try {
                                 result = response[0].body().string();
@@ -87,7 +93,7 @@ public class ProfileFragment extends Fragment {
                                 TextView studentIDView = view.findViewById(R.id.profile_fragment_studentID);
 //                                ModuleAdapter moduleAdapter = new ModuleAdapter(view.getContext(), data);
 
-
+                                // Set view widgets based on JSON data
                                 firstNameView.setText(data.getJSONObject(0).getString("first_name"));
                                 lastNameView.setText(data.getJSONObject(0).getString("last_name"));
                                 studentIDView.setText(data.getJSONObject(0).getString("username"));
@@ -120,6 +126,7 @@ public class ProfileFragment extends Fragment {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Get auth_string
                 final String PREF_FILE = "main_shared_preferences";
                 SharedPreferences mPreferences = view.getContext().getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
                 String auth_string = mPreferences.getString("auth_string", "");
@@ -128,6 +135,7 @@ public class ProfileFragment extends Fragment {
                     return;
                 }
 
+                // Create new JSON object with auth_string
                 JSONObject params = new JSONObject();
                 try {
                     params.put("auth_string", auth_string);
@@ -135,9 +143,11 @@ public class ProfileFragment extends Fragment {
                     e.printStackTrace();
                 }
 
+                // Setup variables for API endpoint
                 String authority = getResources().getString(R.string.API_AUTHORITY);
                 String logout = getResources().getString(R.string.LOGOUT_PATH);
 
+                // Query API in background thread
                 ExecutorService executor = Executors.newSingleThreadExecutor();
                 Looper uiLooper = Looper.getMainLooper();
                 Handler handler = new Handler(uiLooper);
@@ -156,12 +166,15 @@ public class ProfileFragment extends Fragment {
                             @Override
                             public void run() {
                                 if (response[0] == null) {
+                                    // If no response, API might be down; show generic error Toast to user
                                     Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_SHORT).show();
                                 } else if (response[0].code() == 200) {
+                                    // Success; show success Toast and log out (explicit intent)
                                     Toast.makeText(view.getContext(), R.string.successful_logout, Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(view.getContext(), LoginActivity.class);
                                     startActivity(intent);
                                 } else {
+                                    // API error; show generic error Toast and log response code
                                     Toast.makeText(view.getContext(), R.string.unsuccessful_logout, Toast.LENGTH_SHORT).show();
                                     Log.i("LOGOUT", String.valueOf(response[0].code()));
                                 }

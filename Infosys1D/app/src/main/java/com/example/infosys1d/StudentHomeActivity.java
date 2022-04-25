@@ -17,9 +17,11 @@ public class StudentHomeActivity extends AppCompatActivity implements BottomNavi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_home);
 
+        // Not necessary; safeguard in case Android thread policy acts up
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        // Hide action bar
         getSupportActionBar().hide();
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -28,13 +30,14 @@ public class StudentHomeActivity extends AppCompatActivity implements BottomNavi
         bottomNavigationView.setSelectedItemId(R.id.schedule);
 
     }
+    // Setup our fragments
     StudentScheduleFragment studentScheduleFragment = new StudentScheduleFragment();
     StudentModuleFragment studentModuleFragment = new StudentModuleFragment();
     ProfileFragment profileFragment = new ProfileFragment();
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
+        // Handle changing of our navigation bar's selected item
         switch (item.getItemId()) {
             case R.id.schedule:
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, studentScheduleFragment).commit();

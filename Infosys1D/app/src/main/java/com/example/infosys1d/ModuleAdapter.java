@@ -13,7 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ArrayViewHolder> {
-
+    // This class is used as an adapter for a RecyclerView to display a user's registered modules
+    // Code adapted from 50001 lessons
     Context context;
     LayoutInflater mInflater;
     JSONArray dataSource;

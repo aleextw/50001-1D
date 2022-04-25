@@ -40,6 +40,8 @@ public class ProfessorScheduleFragment extends Fragment {
     public ProfessorScheduleFragment(){}
 
     void reloadData(View view) {
+        // reloadData() used to refresh fragment outside of onCreate()
+        // Get auth_string
         final String PREF_FILE = "main_shared_preferences";
         SharedPreferences mPreferences = view.getContext().getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
         String auth_string = mPreferences.getString("auth_string", "");
@@ -48,6 +50,7 @@ public class ProfessorScheduleFragment extends Fragment {
             return;
         }
 
+        // Create new JSON object with auth_string
         JSONObject params = new JSONObject();
         try {
             params.put("auth_string", auth_string);
@@ -55,10 +58,12 @@ public class ProfessorScheduleFragment extends Fragment {
             e.printStackTrace();
         }
 
+        // Setup variables for API endpoint
         String authority = getResources().getString(R.string.API_AUTHORITY);
         String professorPath = getResources().getString(R.string.FACULTY_PATH);
         String schedulePath = getResources().getString(R.string.SCHEDULE_PATH);
 
+        // Query API in background thread
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Looper uiLooper = Looper.getMainLooper();
         Handler handler = new Handler(uiLooper);
@@ -77,8 +82,10 @@ public class ProfessorScheduleFragment extends Fragment {
                     @Override
                     public void run() {
                         if (response[0] == null) {
+                            // If no response, API might be down; show generic error Toast to user
                             Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_LONG).show();
                         } else if (response[0].code() == 200) {
+                            // Success; get data from response as JSON array
                             String result = null;
                             try {
                                 result = response[0].body().string();
@@ -86,12 +93,14 @@ public class ProfessorScheduleFragment extends Fragment {
 
                                 Log.i("PROFESSOR SCHEDULE", data.toString());
 
+                                // Create new ScheduleAdapter and attach to RecyclerView
                                 RecyclerView recyclerView = view.findViewById(R.id.professor_schedule_fragment_recycler_view);
                                 ProfessorScheduleAdapter professorScheduleAdapter = new ProfessorScheduleAdapter(view.getContext(), data);
 
                                 recyclerView.setAdapter(professorScheduleAdapter);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
+                                // Create ItemTouchHelper to enable swiping to delete schedule items
                                 ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
                                     @Override
                                     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -104,6 +113,7 @@ public class ProfessorScheduleFragment extends Fragment {
                                         int position = arrayViewHolder.getAdapterPosition();
 
                                         try {
+                                            // Show AlertDialog to confirm deletion of schedule item
                                             new AlertDialog.Builder(view.getContext())
                                                     .setTitle("Confirm Deletion")
                                                     .setMessage("Do you really want to delete schedule item '" + professorScheduleAdapter.dataSource.getJSONObject(position).get("description") + "'?")
@@ -111,6 +121,8 @@ public class ProfessorScheduleFragment extends Fragment {
                                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int whichButton) {
                                                             if (whichButton == DialogInterface.BUTTON_POSITIVE) {
+                                                                // Confirmed
+                                                                // Get auth_string
                                                                 final String PREF_FILE = "main_shared_preferences";
                                                                 SharedPreferences mPreferences = view.getContext().getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
                                                                 String auth_string = mPreferences.getString("auth_string", "");
@@ -119,6 +131,7 @@ public class ProfessorScheduleFragment extends Fragment {
                                                                     return;
                                                                 }
 
+                                                                // Create JSON object with auth_string and id of schedule item to delete
                                                                 JSONObject params = new JSONObject();
                                                                 try {
                                                                     params.put("auth_string", auth_string);
@@ -126,12 +139,16 @@ public class ProfessorScheduleFragment extends Fragment {
                                                                 } catch (JSONException e) {
                                                                     e.printStackTrace();
                                                                 }
+
                                                                 Log.i("PROFESSOR DEL SCHEDULE", params.toString());
+
+                                                                // Setup variables for API endpoint
                                                                 String authority = getResources().getString(R.string.API_AUTHORITY);
                                                                 String professorPath = getResources().getString(R.string.FACULTY_PATH);
                                                                 String schedulePath = getResources().getString(R.string.SCHEDULE_PATH);
                                                                 String deletePath = getResources().getString(R.string.DELETE_PATH);
 
+                                                                // Query API in background thread
                                                                 ExecutorService executor = Executors.newSingleThreadExecutor();
                                                                 Looper uiLooper = Looper.getMainLooper();
                                                                 Handler handler = new Handler(uiLooper);
@@ -150,10 +167,13 @@ public class ProfessorScheduleFragment extends Fragment {
                                                                             @Override
                                                                             public void run() {
                                                                                 if (response[0] == null) {
+                                                                                    // If no response, API might be down; show generic error Toast to user
                                                                                     Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_SHORT).show();
                                                                                 } else if (response[0].code() == 200) {
+                                                                                    // Success; show success Toast
                                                                                     Toast.makeText(view.getContext(), R.string.successful_schedule_delete, Toast.LENGTH_SHORT).show();
                                                                                 } else {
+                                                                                    // API error; show generic error Toast and log response code
                                                                                     Toast.makeText(view.getContext(), R.string.unsuccessful_schedule_delete, Toast.LENGTH_SHORT).show();
                                                                                     Log.i("PROFESSOR DEL SCHEDULE", String.valueOf(response[0].code()));
                                                                                 }
@@ -161,6 +181,7 @@ public class ProfessorScheduleFragment extends Fragment {
                                                                         });
                                                                     }
                                                                 });
+                                                                // Remove schedule item and refresh fragment
                                                                 professorScheduleAdapter.dataSource.remove(position);
                                                                 professorScheduleAdapter.notifyDataSetChanged();
                                                             }
@@ -172,6 +193,7 @@ public class ProfessorScheduleFragment extends Fragment {
                                     }
                                 };
 
+                                // Attach touch helper to RecyclerView
                                 ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
                                 itemTouchHelper.attachToRecyclerView(recyclerView);
 
@@ -193,6 +215,7 @@ public class ProfessorScheduleFragment extends Fragment {
         View view = inflater.inflate(R.layout.professor_fragment_schedule, container, false);
         reloadData(view);
 
+        // Enable swiping down to refresh fragment
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.professor_schedule_fragment_swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -204,11 +227,13 @@ public class ProfessorScheduleFragment extends Fragment {
 
         TextView addButton = view.findViewById(R.id.professor_schedule_fragment_add_button);
 
+        // Handle add-schedule-item button press
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    Intent intent = new Intent(getView().getContext(), ProfessorAddScheduleItemActivity.class);
-                    startActivityForResult(intent, REQUEST_CODE_NEW_SCHEDULE_ITEM);
+                // Explicit intent to ProfessorAddScheduleItemActivity
+                Intent intent = new Intent(getView().getContext(), ProfessorAddScheduleItemActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_NEW_SCHEDULE_ITEM);
             }
         });
 
@@ -220,6 +245,8 @@ public class ProfessorScheduleFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // If return from activity is ok, means schedule item added successfully
+        // Refresh fragment
         if (resultCode == Activity.RESULT_OK) {
             reloadData(getView());
         }

@@ -35,11 +35,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class StudentScheduleFragment extends Fragment {
-    final int REQUEST_CODE_NEW_SCHEDULE_ITEM = 1000;
-
     public StudentScheduleFragment(){}
 
     void reloadData(View view) {
+        // reloadData used to refresh the schedule fragment
+        // Get auth_string from Shared Preferences
         final String PREF_FILE = "main_shared_preferences";
         SharedPreferences mPreferences = view.getContext().getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
         String auth_string = mPreferences.getString("auth_string", "");
@@ -48,6 +48,7 @@ public class StudentScheduleFragment extends Fragment {
             return;
         }
 
+        // Create new JSON object and query our API for our schedule data in background thread
         JSONObject params = new JSONObject();
         try {
             params.put("auth_string", auth_string);
@@ -77,10 +78,13 @@ public class StudentScheduleFragment extends Fragment {
                     @Override
                     public void run() {
                         if (response[0] == null) {
+                            // If no response, API might be down; show generic error Toast to user
                             Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_LONG).show();
                         } else if (response[0].code() == 200) {
+                            // Success
                             String result = null;
                             try {
+                                // Parse our response data as a JSON array and pass to our Adapter
                                 result = response[0].body().string();
                                 JSONArray data = new JSONArray(result);
 
@@ -89,9 +93,12 @@ public class StudentScheduleFragment extends Fragment {
                                 RecyclerView recyclerView = view.findViewById(R.id.student_schedule_fragment_recycler_view);
                                 StudentScheduleAdapter studentScheduleAdapter = new StudentScheduleAdapter(view.getContext(), data);
 
+                                // Recycler view setup
                                 recyclerView.setAdapter(studentScheduleAdapter);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
+                                // Add ItemTouchHelper to handle swiping of items
+                                // Swipe to mark schedule item as done / completed
                                 ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
                                     @Override
                                     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -103,6 +110,7 @@ public class StudentScheduleFragment extends Fragment {
                                         StudentScheduleAdapter.ArrayViewHolder arrayViewHolder = (StudentScheduleAdapter.ArrayViewHolder) viewHolder;
                                         int position = arrayViewHolder.getAdapterPosition();
 
+                                        // Get auth_string from shared preferences
                                         final String PREF_FILE = "main_shared_preferences";
                                         SharedPreferences mPreferences = view.getContext().getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
                                         String auth_string = mPreferences.getString("auth_string", "");
@@ -111,6 +119,7 @@ public class StudentScheduleFragment extends Fragment {
                                             return;
                                         }
 
+                                        // Create JSON object with auth_string and id of item to mark as complete
                                         JSONObject params = new JSONObject();
                                         try {
                                             params.put("auth_string", auth_string);
@@ -118,12 +127,16 @@ public class StudentScheduleFragment extends Fragment {
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
+
                                         Log.i("STUDENT TOGGLE SCHED", params.toString());
+
+                                        // Setup variables for API endpoint
                                         String authority = getResources().getString(R.string.API_AUTHORITY);
                                         String studentPath = getResources().getString(R.string.STUDENT_PATH);
                                         String schedulePath = getResources().getString(R.string.SCHEDULE_PATH);
                                         String togglePath = getResources().getString(R.string.TOGGLE_PATH);
 
+                                        // Query API in background thread
                                         ExecutorService executor = Executors.newSingleThreadExecutor();
                                         Looper uiLooper = Looper.getMainLooper();
                                         Handler handler = new Handler(uiLooper);
@@ -142,10 +155,13 @@ public class StudentScheduleFragment extends Fragment {
                                                     @Override
                                                     public void run() {
                                                         if (response[0] == null) {
+                                                            // If no response, API might be down; show generic error Toast to user
                                                             Toast.makeText(view.getContext(), R.string.database_error, Toast.LENGTH_SHORT).show();
                                                         } else if (response[0].code() == 200) {
+                                                            // Success, show success Toast to user
                                                             Toast.makeText(view.getContext(), R.string.successful_schedule_toggle, Toast.LENGTH_SHORT).show();
                                                         } else {
+                                                            // API error, show generic error Toast to user and log the response code
                                                             Toast.makeText(view.getContext(), R.string.unsuccessful_schedule_toggle, Toast.LENGTH_SHORT).show();
                                                             Log.i("STUDENT TOGGLE SCHED", String.valueOf(response[0].code()));
                                                         }
@@ -153,10 +169,12 @@ public class StudentScheduleFragment extends Fragment {
                                                 });
                                             }
                                         });
+                                        // Reload the fragment whether successful or not
                                         reloadData(view);
                                     }
                                 };
 
+                                // Attach our touch helper to our RecyclerView
                                 ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
                                 itemTouchHelper.attachToRecyclerView(recyclerView);
 
@@ -178,6 +196,7 @@ public class StudentScheduleFragment extends Fragment {
         View view = inflater.inflate(R.layout.student_fragment_schedule, container, false);
         reloadData(view);
 
+        // Enable swiping down to refresh our fragment
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.student_schedule_fragment_swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override

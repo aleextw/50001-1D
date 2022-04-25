@@ -40,9 +40,11 @@ public class SignupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Not necessary; safeguard in case Android thread policy acts up
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        // Set to our desired layout and hide the action bar
         setContentView(R.layout.activity_signup);
         getSupportActionBar().hide();
 
@@ -58,11 +60,14 @@ public class SignupActivity extends AppCompatActivity {
 
         Intent loginIntent = getIntent();
 
+        // Get username and password fields from login Activity (in case not empty)
         usernameTextView.setText(loginIntent.getStringExtra("username"));
         passwordTextView.setText(loginIntent.getStringExtra("password"));
 
+        // Hide spinner
         progressBar.setVisibility(View.GONE);
 
+        // Get the status of our toggle button (faculty / student) as status[0]
         statusSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 status[0] = isChecked;
@@ -78,15 +83,17 @@ public class SignupActivity extends AppCompatActivity {
                 String password = passwordTextView.getText().toString();
                 String confirmPassword = confirmPasswordTextView.getText().toString();
 
-                // TODO: Replace with proper names
-                // TODO: Shift POST request to secondary method and keep checks in primary method
+                // Check whether any of the fields are empty
+                // If they are, then raise error Toast to user
                 if (username.isEmpty() || firstName.isEmpty() || lastName.isEmpty() ||
                         password.isEmpty() || confirmPassword.isEmpty()) {
                     Toast.makeText(SignupActivity.this, R.string.empty_field, Toast.LENGTH_SHORT).show();
                 } else if (!password.equals(confirmPassword)) {
+                    // Show Toast if password fields don't match
                     Toast.makeText(SignupActivity.this, R.string.unmatched_passwords, Toast.LENGTH_SHORT).show();
                 } else {
                     JSONObject params = new JSONObject();
+                    // Valid fields; Create new JSON object with the data
                     try {
                         params.put("username", username);
                         params.put("password_hash", UserUtils.hashPassword(password));
@@ -96,17 +103,21 @@ public class SignupActivity extends AppCompatActivity {
                     } catch (JSONException | NoSuchAlgorithmException e) {
                         e.printStackTrace();
                     }
+                    // Setup variables for our API endpoints
                     String authority = getResources().getString(R.string.API_AUTHORITY);
                     String signupPath = getResources().getString(R.string.SIGNUP_PATH);
 
+                    // Show spinner while waiting for API result
                     progressBar.setVisibility(View.VISIBLE);
 
+                    // Store API response in response[0]
                     Response[] response = new Response[1];
 
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     Looper uiLooper = Looper.getMainLooper();
                     Handler handler = new Handler(uiLooper);
 
+                    // Run API query in background thread
                     executor.execute(new Runnable() {
                         @Override
                         public void run() {
@@ -120,25 +131,30 @@ public class SignupActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     if (response[0] == null) {
+                                        // If no response, API might be down; show generic error Toast to user
                                         Toast.makeText(SignupActivity.this, R.string.database_error, Toast.LENGTH_SHORT).show();
                                     } else if (response[0].code() == 200) {
+                                        // Successful signup
                                         String result = null;
                                         try {
                                             result = response[0].body().string();
                                             JSONObject data = new JSONObject(result);
                                             Toast.makeText(SignupActivity.this, R.string.successful_login, Toast.LENGTH_SHORT).show();
 
+                                            // Store auth_string in Shared Preferences
                                             mPreferences = SignupActivity.this.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
                                             SharedPreferences.Editor editor = mPreferences.edit();
                                             editor.putString("auth_string", data.getString("auth_string"));
                                             editor.apply();
-                                            Toast.makeText(SignupActivity.this, R.string.successful_login, Toast.LENGTH_SHORT).show();
 
+                                            // Load appropriate Activity depending on JSON data received
                                             Log.i("SIGNUP", data.toString());
                                             if (data.getInt("state") == 1) {
+                                                // If state == 1, load faculty page
                                                 Intent intent = new Intent(SignupActivity.this, ProfessorHomeActivity.class);
                                                 startActivity(intent);
                                             } else {
+                                                // Else, load student page
                                                 Intent intent = new Intent(SignupActivity.this, StudentHomeActivity.class);
                                                 startActivity(intent);
                                             }
@@ -162,6 +178,7 @@ public class SignupActivity extends AppCompatActivity {
         backTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Send user back to login Activity
                 Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                 startActivity(intent);
             }

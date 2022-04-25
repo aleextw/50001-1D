@@ -31,6 +31,7 @@ public class UserUtils {
     static final String PREF_FILE = "main_shared_preferences";
     static SharedPreferences mPreferences;
 
+    // Posts the given data to the specified URL, and returns the response
     public static Response queryAPI(String url, JSONObject data) throws IOException {
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -44,6 +45,7 @@ public class UserUtils {
         return client.newCall(request).execute();
     }
 
+    // Returns the SHA-256 hash of the given password string
     public static String hashPassword(String password) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         BigInteger number = new BigInteger(1, md.digest(password.getBytes(StandardCharsets.UTF_8)));

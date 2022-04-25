@@ -13,6 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 public class StudentScheduleAdapter extends RecyclerView.Adapter<StudentScheduleAdapter.ArrayViewHolder> {
+    // This class is used as an adapter for a RecyclerView to display a student's schedule items
+    // Code adapted from 50001 lessons
 
     Context context;
     LayoutInflater mInflater;

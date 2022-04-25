@@ -41,9 +41,11 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Not necessary; safeguard in case Android thread policy acts up
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        // Set to our desired layout and hide the action bar
         setContentView(R.layout.activity_login);
         getSupportActionBar().hide();
 
@@ -55,20 +57,23 @@ public class LoginActivity extends AppCompatActivity {
 
         progressBar = findViewById(R.id.login_progress_bar);
 
+        // We only want to show our progress bar when querying the API on login
         progressBar.setVisibility(View.GONE);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                // Get username and password values
                 String username = usernameTextView.getText().toString();
                 String password = passwordTextView.getText().toString();
 
+                // If either username or password is empty, show a Toast to the user indicating error
                 if (username.isEmpty()) {
                     Toast.makeText(LoginActivity.this, R.string.no_username, Toast.LENGTH_SHORT).show();
                 } else if (password.isEmpty()) {
                     Toast.makeText(LoginActivity.this, R.string.no_password, Toast.LENGTH_SHORT).show();
                 } else {
+                    // Else, create new JSON object with our username and password hash
                     JSONObject params = new JSONObject();
                     try {
                         params.put("username", username);
@@ -76,11 +81,15 @@ public class LoginActivity extends AppCompatActivity {
                     } catch (JSONException | NoSuchAlgorithmException e) {
                         e.printStackTrace();
                     }
+
+                    // Set up variables for our API endpoint
                     String authority = getResources().getString(R.string.API_AUTHORITY);
                     String loginPath = getResources().getString(R.string.LOGIN_PATH);
 
+                    // Set our spinner to be visible
                     progressBar.setVisibility(View.VISIBLE);
 
+                    // Query API in background thread, and store result to response[0]
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     Looper uiLooper = Looper.getMainLooper();
                     Handler handler = new Handler(uiLooper);
@@ -99,25 +108,30 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     if (response[0] == null) {
+                                        // If no response, API might be down; show generic error Toast to user
                                         Toast.makeText(LoginActivity.this, R.string.database_error, Toast.LENGTH_SHORT).show();
                                     } else if (response[0].code() == 200) {
+                                        // Successful login; show success Toast to user
                                         String result = null;
                                         try {
                                             result = response[0].body().string();
                                             JSONObject data = new JSONObject(result);
                                             Toast.makeText(LoginActivity.this, R.string.successful_login, Toast.LENGTH_SHORT).show();
 
+                                            // Update Shared Preferences with user auth string
                                             mPreferences = LoginActivity.this.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
                                             SharedPreferences.Editor editor = mPreferences.edit();
                                             editor.putString("auth_string", data.getString("auth_string"));
                                             editor.apply();
-                                            Toast.makeText(LoginActivity.this, R.string.successful_login, Toast.LENGTH_SHORT).show();
 
                                             Log.i("LOGIN", data.toString());
+                                            // Load appropriate Activity depending on JSON data received
                                             if (data.getInt("state") == 1) {
+                                                // If state == 1, load faculty page
                                                 Intent intent = new Intent(LoginActivity.this, ProfessorHomeActivity.class);
                                                 startActivity(intent);
                                             } else {
+                                                // Else, load student page
                                                 Intent intent = new Intent(LoginActivity.this, StudentHomeActivity.class);
                                                 startActivity(intent);
                                             }
@@ -141,6 +155,8 @@ public class LoginActivity extends AppCompatActivity {
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Send user via explicit intent to signup page
+                // If username and password fields are not empty, they will be loaded into signup activity
                 Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
                 intent.putExtra("username", usernameTextView.getText().toString());
                 intent.putExtra("password", passwordTextView.getText().toString());
