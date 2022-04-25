@@ -35,3 +35,13 @@ uvicorn --host newaddress.com --port 422 backend:app
 ```
 
 The backend and application should now be running on the new specified host / port.
+
+## **Group Information**
+**Team 1B**
+- Alex Lee 1005195
+- Bryan Sitoh 1005040
+- Emmanuel J.Lopez 1005407
+- Ernest Lim 1005234
+- Gao Fancheng 1004879
+- Lyu Haozhi 1004888
+- Yu Qin 1005327
